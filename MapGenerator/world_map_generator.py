@@ -41,6 +41,5 @@ def create_map(csv_name, out_name, color1, color2, color3):
     fig.update_layout(showlegend=False)
     fig.write_image(out_name)
 
-
 if __name__ == '__main__':
     create_map('test.csv', 'test2.png', 'rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)')
