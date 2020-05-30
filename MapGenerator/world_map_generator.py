@@ -39,8 +39,9 @@ def create_map(csv_name, out_name, color1, color2, color3):
                         color_discrete_map=color_discrete_map
                         )
 
-    fig.update_layout(showlegend=False)
+    fig.update_layout(showlegend=False, geo=dict(showlakes=False))
     fig.write_image(out_name)
+
 
 def update_maps(folder):
     color_requester = 'rgb(0, 125, 125)'
@@ -50,9 +51,10 @@ def update_maps(folder):
     for file in csvList:
         filename, file_extension = os.path.splitext(file)
         taskname = filename.split('_')[0]
-        if file_extension=='.csv' and not(os.path.isfile(folder+os.path.sep+taskname+'_map.png')):               
-            create_map(folder+os.path.sep+file, folder+os.path.sep+taskname+'_map.png', color_requester, color_volunteer, color_collaborator)
-            print(folder+os.path.sep+taskname+'_map.png')
+        if file_extension == '.csv' and not(os.path.isfile(folder + os.path.sep + taskname + '_map.png')):
+            create_map(folder + os.path.sep + file, folder + os.path.sep + taskname + '_map.png', color_requester, color_volunteer, color_collaborator)
+            print(folder + os.path.sep + taskname + '_map.png')
 
-#if __name__ == '__main__':
-#    create_map('test.csv', 'test2.png', 'rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)')
+
+# if __name__ == '__main__':
+#     create_map('test.csv', 'test2.png', 'rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)')
