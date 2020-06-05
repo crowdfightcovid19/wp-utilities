@@ -151,6 +151,7 @@ def create_map_with_strips(csv_name, out_name, colour1, colour2, colour3):
         if country.hasAttribute('class') and country.getAttribute('class') == 'choroplethlocation':
             key = country.getAttribute('fill')
             country.setAttribute('fill', colour_pattern_map[key])
+            print(colour_pattern_map[key])
     # Saved the modified SVG
     dom.writexml(open(temp_svg, 'w'))
 
@@ -193,9 +194,10 @@ def update_maps(folder):
     for file in csvList:
         filename, file_extension = os.path.splitext(file)
         taskname = filename.split('_')[0]
-        if file_extension == '.csv' and not(os.path.isfile(folder + os.path.sep + taskname + '_map.png')):
-            create_map(folder + os.path.sep + file, folder + os.path.sep + taskname + '_map.png', color_requester, color_volunteer, color_collaborator)
+        if file_extension == '.csv' and not(os.path.isfile(folder + os.path.sep + taskname + '_map.svg')):
             print(folder + os.path.sep + taskname + '_map.png')
+            create_map_with_strips(folder + os.path.sep + file, folder + os.path.sep + taskname + '_map.svg', color_requester, color_volunteer, color_collaborator)
+            
 
 
 if __name__ == '__main__':
