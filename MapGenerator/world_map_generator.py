@@ -5,13 +5,12 @@ from collections import defaultdict
 import numpy as np
 from xml.dom import minidom
 import xml.dom.minidom
-#os.environ['path'] += r';C:\Program Files\UniConvertor-2.0rc4\dlls'
-#import cairosvg
+# os.environ['path'] += r';C:\Program Files\UniConvertor-2.0rc4\dlls'
+# import cairosvg
 
-# The conversion to png is commented out because it's difficult to install in 
+# The conversion to png is commented out because it's difficult to install in
 # Windows. The problem is the cairosvg package. To make this package work, you
 # must follow the steps described here: https://stackoverflow.com/a/60220855/13686414
-
 
 
 def load_csv(csv_name):
@@ -159,8 +158,8 @@ def create_map_with_strips(csv_name, out_name, colour1, colour2, colour3):
         os.rename(temp_svg, out_name)
     elif type_file == 'png':
         # Need to check the scale
-        #cairosvg.svg2png(url=temp_svg, write_to=out_name, scale=5)
-        #os.remove(temp_svg)
+        # cairosvg.svg2png(url=temp_svg, write_to=out_name, scale=5)
+        # os.remove(temp_svg)
         print('Conversion to png is disabled.')
 
 
@@ -200,5 +199,5 @@ def update_maps(folder):
 
 
 if __name__ == '__main__':
-#    create_map_with_strips('test.csv', 'test.png', 'rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)')
+    # create_map_with_strips('test.csv', 'test.png', 'rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)')
     create_map_with_strips('test.csv', 'test.svg', 'rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)')
