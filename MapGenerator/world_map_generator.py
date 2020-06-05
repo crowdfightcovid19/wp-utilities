@@ -150,7 +150,8 @@ def create_map_with_strips(csv_name, out_name, colour1, colour2, colour3):
     for country in dom.getElementsByTagName('path'):
         if country.hasAttribute('class') and country.getAttribute('class') == 'choroplethlocation':
             key = country.getAttribute('fill')
-            country.setAttribute('fill', colour_pattern_map[key])
+            if key in colour_pattern_map:
+                country.setAttribute('fill', colour_pattern_map[key])
     # Saved the modified SVG
     dom.writexml(open(temp_svg, 'w'))
 
