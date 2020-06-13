@@ -245,7 +245,7 @@ def write_report(info_request,print_to_pdf=True,\
     footnote_list = []
     now = datetime.now()
     name_file_report = info_request['request_number'][0] + '_Report_' + now.strftime('%Y%m%dT%H%M%S')
-    name_file_emails = info_request['request_number'][0] + '_Emails_' + now.strftime('%Y%m%dT%H%M%S')
+    name_file_emails = info_request['request_number'][0] + '_Report_emails_' + now.strftime('%Y%m%dT%H%M%S')
     path_file_report = os.path.join(path_report_folder,name_file_report + '.docx')
     path_file_emails = os.path.join(path_report_folder,name_file_emails + '.txt')
     copyfile(r'xxx_report.docx',path_file_report)
