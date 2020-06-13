@@ -116,6 +116,17 @@ def sheet_to_inforequest(sheet_api,url_sheet): # Reads information from the spre
     for i_date in [2,3,4,5,6]:
         dict_date[tag_date_list[i_date].replace(' ','_').replace('1','fir').lower()] = date_list[i_date:i_date+1] # I leave it inside a list for consistency with other fields
     info_request['date']= dict_date
+    
+    # Fill empty fields with ''
+    for key in info_request.__iter__():
+        if isinstance(info_request[key],dict):
+            for key2 in info_request[key].__iter__():
+                if not(info_request[key][key2]):
+                    info_request[key][key2] = ['']                
+        else:
+            if not(info_request[key]):
+                info_request[key] = [''] 
+    
     return info_request
 
 def complete_inforequest(db,info_request): # Completes the information in info_request using our databases        
@@ -200,6 +211,21 @@ def complete_inforequest(db,info_request): # Completes the information in info_r
                         info_request[type_person]['full_affiliation'][i_person].replace('<','')
                     info_request[type_person]['full_affiliation'][i_person] = \
                         info_request[type_person]['full_affiliation'][i_person].replace('>','')
+
+def write_name_and_affiliation(info_request_typeperson,ind_person):    
+    #print(info_request_typeperson['wants_to_be_named_publicly'][ind_person].lower())
+    #print(info_request_typeperson)
+    if info_request_typeperson['email'][ind_person]!='none':        
+        if len(info_request_typeperson['wants_to_be_named_publicly'])>ind_person \
+            and info_request_typeperson['wants_to_be_named_publicly'][ind_person].lower()=='yes':
+            text_person = info_request_typeperson['full_name'][ind_person]                
+        else:
+            text_person = 'Anonymous'
+        if not(not(info_request_typeperson['full_affiliation'][ind_person])):
+            text_person = text_person + ' | ' + info_request_typeperson['full_affiliation'][ind_person]
+    else:
+        text_person = 'None'
+    return text_person
     
 def write_report(info_request,print_to_pdf=True): # Writes report in Word
     if info_request['table_finished'][0].lower()!='yes':
@@ -240,22 +266,23 @@ def write_report(info_request,print_to_pdf=True): # Writes report in Word
     p.add_run(info_request['final_outcome'][0] + '—' + info_request['description_success'][0])
     p = document.add_paragraph()
     
-    # Volunteersg    
+    # Volunteers    
     p = document.add_paragraph()
     p.add_run('Volunteers:').bold = True
-    any_volunteer = False
+    # any_volunteer = False
     for i_volunteer in range(len(info_request['volunteer']['email'])):
-        if info_request['volunteer']['email'][i_volunteer]!='none':
-            any_volunteer = True
-            if len(info_request['volunteer']['wants_to_be_named_publicly'])>i_volunteer \
-                and info_request['volunteer']['wants_to_be_named_publicly'][i_volunteer].lower()=='yes':
-                p = document.add_paragraph(info_request['volunteer']['full_name'][i_volunteer])
-            else:
-                p = document.add_paragraph('Anonymous')
-            if not(not(info_request['volunteer']['full_affiliation'][i_volunteer])):
-                p.add_run(' | ' + info_request['volunteer']['full_affiliation'][i_volunteer])  
-    if not(any_volunteer):
-        p = document.add_paragraph('None')
+        # if info_request['volunteer']['email'][i_volunteer]!='none':
+        #     any_volunteer = True
+        p = document.add_paragraph(write_name_and_affiliation(info_request['volunteer'], i_volunteer))
+    #         if len(info_request['volunteer']['wants_to_be_named_publicly'])>i_volunteer \
+    #             and info_request['volunteer']['wants_to_be_named_publicly'][i_volunteer].lower()=='yes':
+    #             p = document.add_paragraph(info_request['volunteer']['full_name'][i_volunteer])
+    #         else:
+    #             p = document.add_paragraph('Anonymous')
+    #         if not(not(info_request['volunteer']['full_affiliation'][i_volunteer])):
+    #             p.add_run(' | ' + info_request['volunteer']['full_affiliation'][i_volunteer])  
+    # if not(any_volunteer):
+    #     p = document.add_paragraph('None')
     
     # if not(not(info_request['collaborator']['text'])) and not(not(info_request['collaborator']['text'][0])):
     #     p = document.add_paragraph()
@@ -310,11 +337,13 @@ def write_report(info_request,print_to_pdf=True): # Writes report in Word
         p.add_run(person[1]).bold = True
         add_footnote(p,footnote_list,text_footnote_person[i_person],bold=True)
         p.add_run(': ').bold = True
-        #print(person)
-        if info_request[person[0]]['email'][0]!='none':
-            p.add_run(info_request[person[0]]['full_name'][0] + ' | ' + info_request[person[0]]['full_affiliation'][0])
-        else:
-            p.add_run('None')
+        # print(person)
+        # print(write_name_and_affiliation(info_request[person[0]], 0))
+        p.add_run(write_name_and_affiliation(info_request[person[0]], 0))
+        # if info_request[person[0]]['email'][0]!='none':
+        #     p.add_run(info_request[person[0]]['full_name'][0] + ' | ' + info_request[person[0]]['full_affiliation'][0])
+        # else:
+        #     p.add_run('None')
     
     # Notes
     p = document.add_paragraph()    
