@@ -7,6 +7,14 @@ folder containing the json file with the credentials. To create that variable, e
 
 os.environ['CRF_CREDENTIALS'] = r'folder_that_contains_your_credentials'
 
+You must also have an environmental variable pointing to the folder where you 
+store your crowdfight-related data. To create this variable, execute
+
+os.environ['CRF_DATA'] = r'folder_that_contains_your_data'
+
+This program also needs the template xxx_report.docx, which must be in the same
+folder as the code
+
 Created on Thu Jun 11 11:31:26 2020
 
 @author: Alfonso
@@ -227,7 +235,9 @@ def write_name_and_affiliation(info_request_typeperson,ind_person):
         text_person = 'None'
     return text_person
     
-def write_report(info_request,print_to_pdf=True): # Writes report in Word
+# Writes report in Word
+def write_report(info_request,print_to_pdf=True,\
+                 path_report_folder=os.path.join(os.environ['CRF_DATA'],'Request_reports')): 
     if info_request['table_finished'][0].lower()!='yes':
         print('WARNING!! Table is marked as NOT FINISHED.')
     if info_request['final_validation_done'][0].lower()!='yes':
@@ -236,9 +246,9 @@ def write_report(info_request,print_to_pdf=True): # Writes report in Word
     now = datetime.now()
     name_file_report = info_request['request_number'][0] + '_Report_' + now.strftime('%Y%m%dT%H%M%S')
     name_file_emails = info_request['request_number'][0] + '_Emails_' + now.strftime('%Y%m%dT%H%M%S')
-    path_file_report = r'C:\GDrive\Hipertec\Coronavirus\Success tables\Reports\\' + name_file_report + '.docx'
-    path_file_emails = r'C:\GDrive\Hipertec\Coronavirus\Success tables\Reports\\' + name_file_emails + '.txt'
-    copyfile(r'C:\GDrive\Hipertec\Coronavirus\Success tables\xxx_report.docx',path_file_report)
+    path_file_report = os.path.join(path_report_folder,name_file_report + '.docx')
+    path_file_emails = os.path.join(path_report_folder,name_file_emails + '.txt')
+    copyfile(r'xxx_report.docx',path_file_report)
     document = Document(path_file_report)
     document.styles['Normal'].font.name = 'Raleway'
     document.styles['Normal'].font.size = Pt(12)
