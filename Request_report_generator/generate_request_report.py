@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+To use this code you need to have credentials for google sheets and google
+drive api's. You need
+to create an environmental variable called CRF_CREDENTIALS pointing to the
+folder containing the json file with the credentials. To create that variable, execute
+
+os.environ['CRF_CREDENTIALS'] = r'folder_that_contains_your_credentials'
+
 Created on Thu Jun 11 11:31:26 2020
 
 @author: Alfonso
