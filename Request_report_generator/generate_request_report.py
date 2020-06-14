@@ -41,7 +41,10 @@ def test():
     """
     generate_reports('https://docs.google.com/spreadsheets/d/1IQQ9toViwCb4dEF50Zlc7wWJNsh1ioZTi5lOmxBzyMs/edit?usp=sharing,%20https://docs.google.com/spreadsheets/d/1Rje2i6swuzbURXBZIy7x_QbAqwo-BnEI9e0-dtNtwKg/edit?usp=sharing')
 
-def generate_reports(url_batch,service=[],sheet_api=[],drive_api=[],db=[]):
+def cosa():
+    print('—')
+
+def generate_reports(url_batch,service=[],sheet_api=[],drive_api=[],db=[]):    
     if not(not(service)):
         sheet_api = service['sheet_api']
         drive_api = service['drive_api']
@@ -72,8 +75,8 @@ def update_organizertable(sheet_api,info_request): # Update organization table
         ind_row = request_number_list.index(info_request['request_number'][0]) + 2
     except:
         ind_row = len(request_number_list) + 2 # If the request is not yet in the table, add it at the end
-    print([info_request['request_number'][0],info_request['url_table'][0],
-          datetime.now().strftime('%Y%m%dT%H%M%S')])
+    # print([info_request['request_number'][0],info_request['url_table'][0],
+    #       datetime.now().strftime('%Y%m%dT%H%M%S')])
     sheet_organizer.update(
         'A'+str(ind_row)+':C'+str(ind_row),\
          [[info_request['request_number'][0],info_request['url_table'][0],
@@ -256,7 +259,7 @@ def write_name_and_affiliation(info_request_typeperson,ind_person):
     
 # Writes report in Word
 def write_report(info_request,print_to_pdf=True,\
-                 path_report_folder=os.path.join(os.environ['CRF_DATA'],'Request_reports')): 
+                 path_report_folder=os.path.join(os.environ['CRF_DATA'],'Request_reports')):     
     if info_request['table_finished'][0].lower()!='yes':
         print('WARNING!! Table is marked as NOT FINISHED.')
     if info_request['final_validation_done'][0].lower()!='yes':
@@ -293,16 +296,22 @@ def write_report(info_request,print_to_pdf=True,\
     p = document.add_paragraph()
     p.add_run('Outcome: ' ).bold = True
     p.add_run(info_request['final_outcome'][0] + '—' + info_request['description_success'][0])
+    print(info_request['final_outcome'][0] + '—' + info_request['description_success'][0])
+    print('—')
     p = document.add_paragraph()
     
     # Volunteers    
     p = document.add_paragraph()
     p.add_run('Volunteers:').bold = True
+    footnote_list_role = []
     # any_volunteer = False
     for i_volunteer in range(len(info_request['volunteer']['email'])):
         # if info_request['volunteer']['email'][i_volunteer]!='none':
         #     any_volunteer = True
-        p = document.add_paragraph(write_name_and_affiliation(info_request['volunteer'], i_volunteer))
+        p = document.add_paragraph()
+        if not(not(info_request['volunteer']['role'][i_volunteer])):
+            add_footnote(p,footnote_list_role,info_request['volunteer']['role'][i_volunteer])
+        p.add_run(write_name_and_affiliation(info_request['volunteer'], i_volunteer))
     #         if len(info_request['volunteer']['wants_to_be_named_publicly'])>i_volunteer \
     #             and info_request['volunteer']['wants_to_be_named_publicly'][i_volunteer].lower()=='yes':
     #             p = document.add_paragraph(info_request['volunteer']['full_name'][i_volunteer])
@@ -341,6 +350,7 @@ def write_report(info_request,print_to_pdf=True,\
     else:
         p = document.add_paragraph('Date of request: None')                
     p = document.add_paragraph('Date of resolution') 
+    add_footnote(p,footnote_list,'For successful requests, this is the date in which we confirmed that the success criterion was reached (we try to be unintrusive during follow-up, so this confirmation can have significant delay). The success criterion is defined beforehand, and is as stringent as possible to guarantee that our activity is truly useful.')
     add_footnote(p,footnote_list,'For successful requests, this is the date in which we confirmed that the success criterion was reached (we try to be unintrusive during follow-up, so this confirmation can have significant delay). The success criterion is defined beforehand, and is as stringent as possible to guarantee that our activity is truly useful.')
     p.add_run(': ' +  datetime.strptime(info_request['date']['success'][0],'%d/%m/%Y %H:%M').strftime('%B %d, %Y'))
     
@@ -399,15 +409,21 @@ def write_report(info_request,print_to_pdf=True,\
         printout_file(path_file_report,wait_for_pdf=True)
 
 def add_footnote(p,footnote_list,text,bold=False):
-    footnote_list.append(text)
-    super_text = p.add_run(str(len(footnote_list)))
+    if footnote_list.count(text)==0:
+        footnote_list.append(text)
+    ind_footnote = footnote_list.index(text) + 1
+    super_text = p.add_run(str(ind_footnote))
     super_text.font.superscript = True      
     super_text.font.bold = bold
 
-def print_footnotes(document,footnote_list,font_size=9):
+def print_footnotes(document,footnote_list,font_size=9,type_symbol='number'):
+    symbol_list = ['*','†','‡','§','#','**','††','‡‡','§§','##']
     for i_footnote,text in enumerate(footnote_list):
         p = document.add_paragraph()
-        super_text = p.add_run(str(i_footnote + 1))
+        if type_symbol=='number':
+            super_text = p.add_run(str(i_footnote + 1))
+        else:
+            super_text = p.add_run(symbol_list[i_footnote])
         super_text.font.superscript = True    
         super_text.font.size = Pt(font_size)
         run = p.add_run(' ' + text)
