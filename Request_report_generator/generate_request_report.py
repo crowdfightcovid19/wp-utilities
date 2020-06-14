@@ -43,6 +43,7 @@ def test():
 
 def cosa():
     print('—')
+    print(chr(8212))
 
 def generate_reports(url_batch,service=[],sheet_api=[],drive_api=[],db=[]):    
     if not(not(service)):
@@ -295,9 +296,7 @@ def write_report(info_request,print_to_pdf=True,\
     p.add_run(info_request['requester']['full_affiliation'][0])
     p = document.add_paragraph()
     p.add_run('Outcome: ' ).bold = True
-    p.add_run(info_request['final_outcome'][0] + '—' + info_request['description_success'][0])
-    print(info_request['final_outcome'][0] + '—' + info_request['description_success'][0])
-    print('—')
+    p.add_run(info_request['final_outcome'][0] + chr(8212) + info_request['description_success'][0])    
     p = document.add_paragraph()
     
     # Volunteers    
@@ -305,29 +304,23 @@ def write_report(info_request,print_to_pdf=True,\
     p.add_run('Volunteers:').bold = True
     footnote_list_role = []
     # any_volunteer = False
+    any_role = False
     for i_volunteer in range(len(info_request['volunteer']['email'])):
         # if info_request['volunteer']['email'][i_volunteer]!='none':
         #     any_volunteer = True
         p = document.add_paragraph()
-        if not(not(info_request['volunteer']['role'][i_volunteer])):
-            add_footnote(p,footnote_list_role,info_request['volunteer']['role'][i_volunteer])
+        if len(info_request['volunteer']['role'])>i_volunteer \
+           and not(not(info_request['volunteer']['role'][i_volunteer])):
+            add_footnote(p,footnote_list_role,info_request['volunteer']['role'][i_volunteer],type_symbol='symbol')
+            any_role = True
         p.add_run(write_name_and_affiliation(info_request['volunteer'], i_volunteer))
-    #         if len(info_request['volunteer']['wants_to_be_named_publicly'])>i_volunteer \
-    #             and info_request['volunteer']['wants_to_be_named_publicly'][i_volunteer].lower()=='yes':
-    #             p = document.add_paragraph(info_request['volunteer']['full_name'][i_volunteer])
-    #         else:
-    #             p = document.add_paragraph('Anonymous')
-    #         if not(not(info_request['volunteer']['full_affiliation'][i_volunteer])):
-    #             p.add_run(' | ' + info_request['volunteer']['full_affiliation'][i_volunteer])  
-    # if not(any_volunteer):
-    #     p = document.add_paragraph('None')
-    
-    # if not(not(info_request['collaborator']['text'])) and not(not(info_request['collaborator']['text'][0])):
-    #     p = document.add_paragraph()
-    #     p = document.add_paragraph()
-    #     p.add_run('Established collaborations:').bold = True
-    #     for text_collaboration in info_request['collaborator']['text']:
-    #         p = document.add_paragraph(text_collaboration)
+    # Volunteers' roles
+    if any_role:
+        p = document.add_paragraph()
+        p = document.add_paragraph()
+        p.add_run('Volunteers\' roles:').bold = True
+        print_footnotes(document,footnote_list_role,font_size=12)
+        
     
     # Timeline
     p = document.add_paragraph()
@@ -408,23 +401,31 @@ def write_report(info_request,print_to_pdf=True,\
     if print_to_pdf:
         printout_file(path_file_report,wait_for_pdf=True)
 
-def add_footnote(p,footnote_list,text,bold=False):
-    if footnote_list.count(text)==0:
-        footnote_list.append(text)
-    ind_footnote = footnote_list.index(text) + 1
-    super_text = p.add_run(str(ind_footnote))
-    super_text.font.superscript = True      
+def add_footnote(p,footnote_list,text,bold=False,type_symbol='number'):
+    symbol_list = ['*',chr(8224),chr(8225),chr(167),'#','**',
+                   chr(8224)+chr(8224),chr(8225)+chr(8225),chr(167)+chr(167),'##']
+    if not(footnote_list):
+        footnote_list.append([])
+        footnote_list.append([]) # First list for symbols, second for texts
+    if footnote_list[1].count(text)==0:
+        footnote_list[1].append(text)
+        if type_symbol=='number':
+            footnote_list[0].append(str(len(footnote_list[1])))
+        else:
+            footnote_list[0].append(symbol_list[len(footnote_list[1])-1])
+    ind_footnote = footnote_list[1].index(text)
+    super_text = p.add_run(footnote_list[0][ind_footnote])
+    if footnote_list[0][ind_footnote]!='*':
+        super_text.font.superscript = True      
     super_text.font.bold = bold
 
-def print_footnotes(document,footnote_list,font_size=9,type_symbol='number'):
-    symbol_list = ['*','†','‡','§','#','**','††','‡‡','§§','##']
-    for i_footnote,text in enumerate(footnote_list):
-        p = document.add_paragraph()
-        if type_symbol=='number':
-            super_text = p.add_run(str(i_footnote + 1))
-        else:
-            super_text = p.add_run(symbol_list[i_footnote])
-        super_text.font.superscript = True    
+def print_footnotes(document,footnote_list,font_size=9):     
+    footnote_list
+    for i_footnote,text in enumerate(footnote_list[1]):
+        p = document.add_paragraph()        
+        super_text = p.add_run(footnote_list[0][i_footnote])
+        if footnote_list[0][i_footnote]!='*': # Because the asterisk is already a superscript
+            super_text.font.superscript = True    
         super_text.font.size = Pt(font_size)
         run = p.add_run(' ' + text)
         run.font.size = Pt(font_size)
