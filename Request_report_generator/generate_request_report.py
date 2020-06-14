@@ -55,12 +55,30 @@ def generate_reports(url_batch,service=[],sheet_api=[],drive_api=[],db=[]):
         info_request = sheet_to_inforequest(sheet_api,url)
         print(info_request['request_number'])        
         complete_inforequest(db, info_request)        
-        write_report(info_request)
+        write_report(info_request)     
+        update_organizertable(sheet_api,info_request)           
     service = {
         'sheet_api' : sheet_api,
         'drive_api' : drive_api,
         'db' : db}
     return service
+
+def update_organizertable(sheet_api,info_request): # Update organization table
+    sheet_organizer = sheet_api.open_by_url(\
+        'https://docs.google.com/spreadsheets/d/1JCtFrOjdDdxI99NPGoMfWO9TWiVGOmVHE9Dqg8Yxi8c/edit#gid=906247198'\
+         ).worksheet('Ready to publish')
+    request_number_list = sheet_organizer.col_values(1)[1:]
+    try:
+        ind_row = request_number_list.index(info_request['request_number'][0]) + 2
+    except:
+        ind_row = len(request_number_list) + 2 # If the request is not yet in the table, add it at the end
+    print([info_request['request_number'][0],info_request['url_table'][0],
+          datetime.now().strftime('%Y%m%dT%H%M%S')])
+    sheet_organizer.update(
+        'A'+str(ind_row)+':C'+str(ind_row),\
+         [[info_request['request_number'][0],info_request['url_table'][0],
+          datetime.now().strftime('%Y%m%dT%H%M%S')]]
+         )
 
 def open_apis():
     # use creds to create a client to interact with the Google Drive API
@@ -88,6 +106,7 @@ def sheet_to_inforequest(sheet_api,url_sheet): # Reads information from the spre
     sheet_origin = sheet_api.open_by_url(url_sheet).sheet1
     list_origin = sheet_origin.get_all_values()
     info_request = {}
+    info_request['url_table'] = [url_sheet]
     info_nested = {}
     name_nest = ''
     for row in list_origin:
@@ -245,7 +264,7 @@ def write_report(info_request,print_to_pdf=True,\
     footnote_list = []
     now = datetime.now()
     name_file_report = info_request['request_number'][0] + '_Report_' + now.strftime('%Y%m%dT%H%M%S')
-    name_file_emails = info_request['request_number'][0] + '_Report_emails_' + now.strftime('%Y%m%dT%H%M%S')
+    name_file_emails = info_request['request_number'][0] + '_Report_' + now.strftime('%Y%m%dT%H%M%S') + '_emails'
     path_file_report = os.path.join(path_report_folder,name_file_report + '.docx')
     path_file_emails = os.path.join(path_report_folder,name_file_emails + '.txt')
     copyfile(r'xxx_report.docx',path_file_report)
@@ -442,6 +461,14 @@ def printout_file(path_file,wait_for_pdf=False):
       ".",
       0
     )
-    # Wait until the pdf is created
-    while wait_for_pdf and not(os.path.isfile(path_file.replace('.docx','.pdf'))):
-        time.sleep(1)
+    # Wait until the pdf is created (and its size stops growing)
+    filesize_last = 0
+    while wait_for_pdf \
+          and (
+              not(os.path.isfile(path_file.replace('.docx','.pdf'))) 
+               or filesize_last<os.path.getsize(path_file.replace('.docx','.pdf'))
+               ):
+        if not(not(os.path.isfile(path_file.replace('.docx','.pdf')))):
+            filesize_last = os.path.getsize(path_file.replace('.docx','.pdf'))
+        time.sleep(1)    
+        
