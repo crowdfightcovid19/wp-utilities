@@ -41,10 +41,6 @@ def test():
     """
     generate_reports('https://docs.google.com/spreadsheets/d/1IQQ9toViwCb4dEF50Zlc7wWJNsh1ioZTi5lOmxBzyMs/edit?usp=sharing,%20https://docs.google.com/spreadsheets/d/1Rje2i6swuzbURXBZIy7x_QbAqwo-BnEI9e0-dtNtwKg/edit?usp=sharing')
 
-def cosa():
-    print('—')
-    print(chr(8212))
-
 def generate_reports(url_batch,service=[],sheet_api=[],drive_api=[],db=[]):    
     if not(not(service)):
         sheet_api = service['sheet_api']
@@ -78,10 +74,15 @@ def update_organizertable(sheet_api,info_request): # Update organization table
         ind_row = len(request_number_list) + 2 # If the request is not yet in the table, add it at the end
     # print([info_request['request_number'][0],info_request['url_table'][0],
     #       datetime.now().strftime('%Y%m%dT%H%M%S')])
+    if (info_request['table_finished'][0].lower()=='yes' 
+            and info_request['final_validation_done'][0].lower()=='yes'):
+        finished_and_validated = 'Yes'
+    else:
+        finished_and_validated = 'No'
     sheet_organizer.update(
-        'A'+str(ind_row)+':C'+str(ind_row),\
+        'A'+str(ind_row)+':D'+str(ind_row),\
          [[info_request['request_number'][0],info_request['url_table'][0],
-          datetime.now().strftime('%Y%m%dT%H%M%S')]]
+          datetime.now().strftime('%Y%m%dT%H%M%S'),finished_and_validated]]
          )
 
 def open_apis():
