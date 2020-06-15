@@ -99,14 +99,13 @@ def load_db(sheet_api): # Load the common databases (volunteer database, staff d
     db = {}
     # Load staff database
     book_advisormanagement = sheet_api.open_by_url('https://docs.google.com/spreadsheets/d/1tKaNv6P1vwv1ll21GBmeKNYSNI11N_kTZiW2yjfqAW0/edit#gid=1858226365')
-    sheet_staff = book_advisormanagement.get_worksheet(-1)
+    sheet_staff = book_advisormanagement.worksheet('Full staff')
     db['staff'] = sheet_staff.get_all_values()
     # Load volunteer database
     sheet_volunteer = sheet_api.open_by_url('https://docs.google.com/spreadsheets/d/15kBVUpcsb1Y3vAaHYFV4WnTjNUO6wiBXhuciJUEAx-I/edit#gid=1550850176').sheet1
     db['volunteer'] = sheet_volunteer.get_all_values()
     return db
-    
-
+  
 def sheet_to_inforequest(sheet_api,url_sheet): # Reads information from the spreadsheet    
     sheet_origin = sheet_api.open_by_url(url_sheet).sheet1
     list_origin = sheet_origin.get_all_values()
@@ -344,8 +343,7 @@ def write_report(info_request,print_to_pdf=True,\
     else:
         p = document.add_paragraph('Date of request: None')                
     p = document.add_paragraph('Date of resolution') 
-    add_footnote(p,footnote_list,'For successful requests, this is the date in which we confirmed that the success criterion was reached (we try to be unintrusive during follow-up, so this confirmation can have significant delay). The success criterion is defined beforehand, and is as stringent as possible to guarantee that our activity is truly useful.')
-    add_footnote(p,footnote_list,'For successful requests, this is the date in which we confirmed that the success criterion was reached (we try to be unintrusive during follow-up, so this confirmation can have significant delay). The success criterion is defined beforehand, and is as stringent as possible to guarantee that our activity is truly useful.')
+    add_footnote(p,footnote_list,'For successful requests, this is the date in which we confirmed that the success criterion was reached (we try to be unintrusive during follow-up, so this confirmation can have significant delay). The success criterion is defined beforehand, and is as stringent as possible to guarantee that our activity is truly useful.')    
     p.add_run(': ' +  datetime.strptime(info_request['date']['success'][0],'%d/%m/%Y %H:%M').strftime('%B %d, %Y'))
     
     # Crowdfight staff
