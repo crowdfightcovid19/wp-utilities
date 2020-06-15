@@ -20,19 +20,19 @@ Created on Thu Jun 11 11:31:26 2020
 @author: Alfonso
 """
 
+from datetime import datetime
+import time
+import os
+from shutil import copyfile
 
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from apiclient import discovery
-from shutil import copyfile
-from datetime import datetime
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Pt
 import win32api
 import win32print
-import time
-import os
 
 def test():
     """
