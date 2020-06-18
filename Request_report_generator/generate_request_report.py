@@ -67,11 +67,11 @@ def update_organizertable(sheet_api,info_request): # Update organization table
     sheet_organizer = sheet_api.open_by_url(\
         'https://docs.google.com/spreadsheets/d/1JCtFrOjdDdxI99NPGoMfWO9TWiVGOmVHE9Dqg8Yxi8c/edit#gid=906247198'\
          ).worksheet('Ready to publish')
-    request_number_list = sheet_organizer.col_values(1)[1:]
+    request_number_list = sheet_organizer.col_values(1)
     try:
-        ind_row = request_number_list.index(info_request['request_number'][0]) + 2
+        ind_row = request_number_list.index(info_request['request_number'][0]) + 1
     except:
-        ind_row = len(request_number_list) + 2 # If the request is not yet in the table, add it at the end
+        ind_row = len(request_number_list) + 1 # If the request is not yet in the table, add it at the end
     # print([info_request['request_number'][0],info_request['url_table'][0],
     #       datetime.now().strftime('%Y%m%dT%H%M%S')])
     if (info_request['table_finished'][0].lower()=='yes' 
