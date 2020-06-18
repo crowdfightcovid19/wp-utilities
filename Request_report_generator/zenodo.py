@@ -4,10 +4,10 @@ import requests
 import json
 
 
-def preReserveDOI(ACCESS_TOKEN=[], sandbox=False):
+def preReserveDOI(ACCESS_TOKEN=None, sandbox=False):
     # preReserveDOI return a unpublished conceptDOI and a version DOI
 
-    if not(ACCESS_TOKEN):
+    if ACCESS_TOKEN is None:
         ACCESS_TOKEN = os.environ['ZENODO-API-KEY']
 
     # Production comment this 4 lines
@@ -31,6 +31,7 @@ def preReserveDOI(ACCESS_TOKEN=[], sandbox=False):
                       headers=headers)
 
     data = r.json()
+    print(r.url)
     print(data)
     v_doi = data['metadata']['prereserve_doi']['doi']
     c_doi = v_doi.rsplit('.', 1)[0] + '.' + str(data['conceptrecid'])
@@ -39,7 +40,7 @@ def preReserveDOI(ACCESS_TOKEN=[], sandbox=False):
     return c_doi, v_doi, links
 
 
-def publish(document_path, filename, links, metadata, ACCESS_TOKEN=[],
+def publish(document_path, filename, links, metadata, ACCESS_TOKEN=None,
             sandbox=False):
     # metadata example:
     # {'metadata': {'title': 'My first upload',
@@ -48,7 +49,7 @@ def publish(document_path, filename, links, metadata, ACCESS_TOKEN=[],
     #                      'creators': [{'name': 'Doe, John',
     #                                   'affiliation': 'Zenodo'}]}}
     # Publish the document
-    if not(ACCESS_TOKEN):
+    if ACCESS_TOKEN is None:
         ACCESS_TOKEN = os.environ['ZENODO-API-KEY']
     bucket_url = links['bucket']
     # ACCESS_TOKEN = 'USEYOURTOKEN'
@@ -75,7 +76,8 @@ def publish(document_path, filename, links, metadata, ACCESS_TOKEN=[],
 
 
 if __name__ == '__main__':
-    ACCESS_TOKEN = 'ZkSjaf1ZxmHstib0YxW8N6kQN9uDWaoaYlWJcnpZ00HqZYsQ05iUHnQ1FuiI' # Alfonso's sandbox credentials
+    ACCESS_TOKEN = 'ZkSjaf1ZxmHstib0YxW8N6kQN9uDWaoaYlWJcnpZ00HqZYsQ05iUHnQ1FuiI'  # Alfonso's sandbox credentials
+    # ACCESS_TOKEN = 'PEUgknlviyHWPGPOny3o0YyTodjLPCzTaQO0DDrxAv5MGvFv7CIsGWIPODm2'  # Antoine's sandbox credentials
     c_doi, v_doi, links = preReserveDOI(ACCESS_TOKEN=ACCESS_TOKEN,
                                         sandbox=True)
     metatdata = {'metadata': {'title': 'My first upload',
