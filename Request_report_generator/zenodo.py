@@ -4,12 +4,12 @@ import requests
 import json
 
 
-def preReserveDOI(ACCESS_TOKEN=[],sandbox=False):
-    # preReserveDOI return a unpublished conceptDOI and a version DOI 
-    
+def preReserveDOI(ACCESS_TOKEN=[], sandbox=False):
+    # preReserveDOI return a unpublished conceptDOI and a version DOI
+
     if not(ACCESS_TOKEN):
         ACCESS_TOKEN = os.environ['ZENODO-API-KEY']
-    
+
     # Production comment this 4 lines
     # ACCESS_TOKEN = 'USEYOURTOKEN'
     params = {'access_token': ACCESS_TOKEN, 'prereserve_doi': 'true'}
@@ -39,7 +39,7 @@ def preReserveDOI(ACCESS_TOKEN=[],sandbox=False):
     return c_doi, v_doi, links
 
 
-def publish(document_path, filename, links, metadata,ACCESS_TOKEN=[],
+def publish(document_path, filename, links, metadata, ACCESS_TOKEN=[],
             sandbox=False):
     # metadata example:
     # {'metadata': {'title': 'My first upload',
@@ -64,7 +64,8 @@ def publish(document_path, filename, links, metadata,ACCESS_TOKEN=[],
         print(r.status_code)
 
     r = requests.put(links['self'],
-                     params={'access_token': ACCESS_TOKEN}, data=json.dumps(metadata), headers=headers)
+                     params={'access_token': ACCESS_TOKEN},
+                     data=json.dumps(metadata), headers=headers)
     print(r.status_code)
 
     r = requests.post(links['publish'],
