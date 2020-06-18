@@ -4,10 +4,6 @@ import requests
 import json
 
 
-def test(thing):
-    if thing:
-        ACCESS_TOKEN = os.environ['ZENODO-API-KEY']
-
 def preReserveDOI(ACCESS_TOKEN=[],sandbox=False):
     # preReserveDOI return a unpublished conceptDOI and a version DOI 
     
